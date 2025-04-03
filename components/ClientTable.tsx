@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getClients, updateClient, deleteClient } from "@/supabase/client";
+import { useState } from "react";
+import { updateClient, deleteClient } from "@/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -10,7 +10,7 @@ export type Client = {
   name: string;
   email: string;
   user_id: string;
-  created_at: string;
+  created_at: string | null;
 };
 
 type ClientTableProps = {

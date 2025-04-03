@@ -1,37 +1,31 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/supabase/supabaseClient";
+import { useState, useEffect } from "react";
+import { createBrowserClient } from "@supabase/ssr";
 import { Button } from "@/components/ui/button";
 
-export default function LoginForm() {
-  const router = useRouter();
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ 1. Track auth changes
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        window.location.href = "/dashboard"; // final bulletproof fallback
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = "/dashboard";
     });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
+    setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: {
-        redirectTo: "http://127.0.0.1:3000/auth/callback",
-      },
+      options: { redirectTo: `${location.origin}/auth/callback` },
     });
-
     if (error) alert(error.message);
+    setLoading(false);
   };
 
   const handleEmailLogin = async () => {

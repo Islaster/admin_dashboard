@@ -25,8 +25,9 @@ export default function AddClientForm() {
       setName("");
       setEmail("");
       window.location.reload();
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error("Failed to add client.");
+      console.log(err);
     } finally {
       setLoading(false);
     }
